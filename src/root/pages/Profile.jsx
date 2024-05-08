@@ -28,7 +28,7 @@ const Profile = () => {
       }
     }
     getUserInfo()
-  },[])
+  },[id])
   return (
     <div className='profile-container'>
       <div className="profile-details w-full flex gap-x-5">

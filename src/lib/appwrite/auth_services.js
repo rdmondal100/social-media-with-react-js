@@ -31,7 +31,7 @@ export class AuthService {
           accountId: userAccount.$id,
           name: userAccount.name,
           email: userAccount.email,
-          username: username,
+          username: "@"+ username,
           imageUrl: avatarUrl,
         })
 
