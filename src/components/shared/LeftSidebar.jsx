@@ -34,7 +34,7 @@ const LeftSidebar = () => {
 					<div className='flex flex-col'>
 						<p className='body-bold '>{userData?.name}</p>
 						<p className='small-regular text-light-3 '>
-							@{userData?.username}
+							{userData?.username}
 						</p>
 					</div>
 				</Link>
