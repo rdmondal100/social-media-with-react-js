@@ -2,21 +2,24 @@ import Loader from "@/components/shared/Loader";
 import PostCard from "@/components/shared/PostCard";
 import postServices from "@/lib/appwrite/post_services";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 const Home = () => {
 
 
 	const [isPostLoading, setIsPostLoading] = useState(true);
 	const [posts, setPosts] = useState(null);
+	const {pathname} = useLocation()
 	useEffect(() => {
 		const getPost = async () => {
+			setIsPostLoading(true)
 			const data = await postServices.getRecentPosts();
 			setPosts(data);
 			console.log(data);
 			setIsPostLoading(false);
 		};
 		getPost();
-	}, []);
+	}, [pathname]);
 
 	return (
 		<div className='flex flex-1 '>
