@@ -17,9 +17,12 @@ import authService from "@/lib/appwrite/auth_services";
 import { signUpValidation } from "@/lib/validation";
 import { ToastAction } from "@/components/ui/toast";
 import { useState } from "react";
+import useCheckAuthUser from "@/hooks/useCheckAuthUser";
 
 const SignUpForm = () => {
 	const navigate = useNavigate();
+	const {checkAuthUser} =useCheckAuthUser();
+
 	const { toast } = useToast();
   const [isCreating,setIsCreating]=useState(false)
 
@@ -38,14 +41,14 @@ const SignUpForm = () => {
 			setIsCreating(true)
 			const newUser = await authService.createUserAccount(userData);
       console.log(newUser.response)
-			if (newUser.$id) {
-				const session = await  authService.signIn({
+			if (newUser?.$id) {
+				const session = await authService.signIn({
 					email: userData.email,
 					password: userData.password,
 				});
+				console.log(session)
+				if (session && checkAuthUser()) {
 
-				if (session) {
-					setIsCreating(false)
 					navigate("/")
 					form.reset();
 					toastMessage(
@@ -54,7 +57,6 @@ const SignUpForm = () => {
 						"Wellcome to GreyBook!"
 					);
 				} else {
-					setIsCreating(false)
 					toastMessage(
 						"destructive",
 						"Failed☹️",
@@ -62,14 +64,12 @@ const SignUpForm = () => {
 					);
 				}
 			} else if (newUser?.response?.code === 409) {
-				setIsCreating(false)
 				toastMessage(
 					"destructive",
 					"Failed☹️",
 					"An account with the same email already exists, Please try with different email"
 				);
 			}else if(newUser?.response?.code ===429){
-				setIsCreating(false)
 				toastMessage(
 					"destructive",
 					"Too Many Request!",
@@ -78,13 +78,14 @@ const SignUpForm = () => {
 			}
 			
 		} catch (error) {
-			setIsCreating(false)
 			console.error("Failed to create newUser", error);
 			toastMessage(
 				"destructive",
 				"Failed☹️",
 				"An unexpected error occurred. Please try again"
 			);
+		}finally{
+			setIsCreating(false)
 		}
 	}
 
@@ -107,9 +108,9 @@ const SignUpForm = () => {
 	return (
 		<Form {...form}>
 			<div className='sm:w-420 flex-center flex-col'>
-				<img src='/assets/images/logo.svg' alt='logo' />
+				<img src='/assets/images/logo.svg' alt='logo' className="w-48 lg:w-60 mt-2" />
 
-				<h2 className='h3-bold md:h2-bold pt-5 sm:pt-12'>
+				<h2 className='h3-bold md:h2-bold pt-5 sm:pt-5'>
 					Create a new account
 				</h2>
 				<p className='text-slate-300 small-medium md:base-regular mt-2'>

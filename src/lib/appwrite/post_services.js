@@ -233,7 +233,7 @@ export class PostServices {
    async getInfinitePosts(id){
       console.log(id)
 
-      const queries=[Query.orderDesc('$updatedAt'), Query.limit(5)]
+      const queries=[Query.orderDesc('$updatedAt'), Query.limit(6)]
       if(id){
          console.log("get page praram")
          queries.push(Query.cursorAfter(id.toString()))
@@ -244,7 +244,7 @@ export class PostServices {
             envVariables.appwritePostsCollectionId,
             queries
          )
-         
+
       
             console.log("**********get the post ********")
             console.log(id)
@@ -262,17 +262,76 @@ export class PostServices {
 
    async searchPosts(searchString){
 
-
+const searchParam = String(searchString)
       try {
          const posts = await this.databases.listDocuments(
             envVariables.appwriteDatabaseId,
             envVariables.appwritePostsCollectionId,
-            [Query.search('caption',searchString)]
+            [Query.contains('caption',searchParam)]
          )
          if(!posts) {
             throw Error;
          }
          return posts;
+      } catch (error) {
+         console.log(error)
+      }
+   }
+
+
+   //get saved post
+
+   async getSavedPost(userId){
+      try {
+         if(userId){
+            const savedPost = await this.databases.listDocuments(
+               envVariables.appwriteDatabaseId,
+               envVariables.appwriteSavesCollectionId,
+               [Query.equal("user",userId)]
+            )
+            console.log(savedPost)
+            if(!savedPost){
+               console.log("Error geting saved post")
+            }
+            return savedPost
+         }
+ 
+      } catch (error) {
+         console.log(error)
+      }
+   }
+
+
+   //get all users
+   async getAllUsers(){
+      try {
+         const allUsers = await this.databases.listDocuments(
+            envVariables.appwriteDatabaseId,
+            envVariables.appwriteUsersCollectionId,
+            [Query.orderDesc("$createdAt")]
+         )
+         if(!allUsers){
+            console.log("Error getting allUsers")
+         }
+         return allUsers;
+      } catch (error) {
+         console.log(error)
+      }
+   }
+
+
+   //user info by id
+   async getUserInfo(userId){
+      try {
+         const userInfo = await this.databases.getDocument(
+            envVariables.appwriteDatabaseId,
+            envVariables.appwriteUsersCollectionId,
+            userId
+         )
+         if(!userInfo){
+            console.log("Error getting userinfo")
+         }
+         return userInfo;
       } catch (error) {
          console.log(error)
       }

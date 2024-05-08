@@ -49,6 +49,11 @@ const useNav=()=>{
     label: "Explore",
   },
   {
+    icon: <MdOutlinePeopleAlt/>,
+    route: "/all-users",
+    label: "People",
+  },
+  {
     icon:  <BiBookmarkHeart/>,
     route: "/saved",
     label: "Saved",

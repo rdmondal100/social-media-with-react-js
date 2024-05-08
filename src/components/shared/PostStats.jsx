@@ -12,7 +12,7 @@ const PostStats = ({ post, userId }) => {
 	const [likes, setLikes] = useState(likesList);
 	const [isSaved, setIsSaved] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-
+  const {userData} = useSelector((state)=>state.auth)
 	const handleLIkePost = (e) => {
 		e.stopPropagation();
 		let newLikes = [...likes];
@@ -78,7 +78,7 @@ const PostStats = ({ post, userId }) => {
 					onClick={handleLIkePost}
 					className=' cursor-pointer'
 				/>
-				<p className=' small-medium lg:base-medium'>{likes.length}</p>
+				<p className=' small-medium lg:base-medium'>{likes?.length}</p>
 			</div>
 			<div className='flex gap-2 '>
 				{isLoading ? (

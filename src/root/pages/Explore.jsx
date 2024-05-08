@@ -1,5 +1,5 @@
+import GridPostList from "@/components/shared/GridPostList";
 import Loader from "@/components/shared/Loader";
-import PostCard from "@/components/shared/PostCard";
 import SearchResults from "@/components/shared/SearchResults";
 import { Input } from "@/components/ui/input";
 import useDebounce from "@/hooks/useDebounce";
@@ -8,30 +8,56 @@ import postServices from "@/lib/appwrite/post_services";
 import { useEffect, useState, useRef } from "react";
 
 const Explore = () => {
-	const [postList, setPostList] = useState([]);
+	const [postDoc, setPostDoc] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [lastPostId, setLastPostId] = useState("");
 	const [fetching, setFetching] = useState(false);
-  const [allCaughtUp, setAllCaughtUp] = useState(false); // State to track if all posts are fetched
+  const [allCaughtUp, setAllCaughtUp] = useState(false);
 
-	const lastPostIdRef = useRef(null); // Create a ref for lastPostId
-
+	const lastPostIdRef = useRef(null);
   const [searchValue, setSearchValue] = useState("");
-  const debouncedValue = useDebounce(searchValue,500)
 
-  //search function
+  const debouncedValue = useDebounce(searchValue,500)
+  const [searchedPost,setSearchedPost]= useState([]);
+  const [isSearching,setIsSearchig] = useState(false)
+
+  //search functionality
     const handleSearchOnChange=async (e)=>{
-      setSearchValue(e.target.value)
-    const data= await postServices.searchPosts(debouncedValue)
-    console.log(data)
+      setIsSearchig(true)
+    setSearchValue(e.target.value)
+
   }
 
+
+  useEffect(()=>{
+    const getSearchPosts = async ()=>{
+      try {
+        setIsSearchig(true)
+
+        if(debouncedValue){
+          const data = await postServices.searchPosts(debouncedValue)
+          console.log(data)
+          setSearchedPost(data)
+          if(data.documents.length ==0){
+            setAllCaughtUp(false)
+          }
+      }
+      } catch (error) {
+          console.log(error)
+      }finally{
+          setIsSearchig(false)
+      }
+ 
+    }
+    getSearchPosts();
+
+  },[debouncedValue])
 
 
 
 
 	useEffect(() => {
-		lastPostIdRef.current = lastPostId; // Update the ref when lastPostId changes
+		lastPostIdRef.current = lastPostId; 
 	}, [lastPostId]);
 
 	useEffect(() => {
@@ -48,7 +74,7 @@ const Explore = () => {
 					}
 					return id;
 				});
-				setPostList(initialPost.documents);
+				setPostDoc(initialPost.documents);
 			} catch (error) {
 				console.log(error);
 			} finally {
@@ -56,6 +82,7 @@ const Explore = () => {
 			}
 		};
 
+    
 		fetchInitialPost();
 	}, []);
 
@@ -72,13 +99,12 @@ const Explore = () => {
 				!fetching && !allCaughtUp &&
 				lastPostIdRef.current &&
 				Math.floor(scrollTop + clientHeight) >=
-					Math.floor(scrollHeight - 100)
+					Math.floor(scrollHeight - 300)
 			) {
 				setFetching(true);
 				const getMorePost = await postServices.getInfinitePosts(
 					lastPostIdRef.current
 				);
-
         if (getMorePost?.documents?.length === 0) {
           setAllCaughtUp(true); 
         } else {
@@ -88,8 +114,8 @@ const Explore = () => {
 
 				setFetching(false);
 
-				console.log(postList);
-				setPostList((prevPosts) => [
+				console.log(postDoc);
+				setPostDoc((prevPosts) => [
 					...prevPosts,
 					...getMorePost.documents,
 				]);
@@ -102,17 +128,16 @@ const Explore = () => {
 		}
 	};
 
-  const debouncedScroll = useDebounceGetPost(handleScroll, 50);
+  const debouncedScroll = useDebounceGetPost(handleScroll, 100);
 
 
   useEffect(() => {
-    window.addEventListener("scroll", debouncedScroll); // Use debouncedScroll
+    window.addEventListener("scroll", debouncedScroll); 
     return () => window.removeEventListener("scroll", debouncedScroll);
   }, []);
 
-  console.log(postList)
   const showSearchResults = searchValue !=='';
-    const showPosts = !showSearchResults && (postList?.length !==0)
+    const showPosts = !showSearchResults && (postDoc?.length !==0)
 	return (
     <div className='explore-container'>
     <div className='explore-inner_container'>
@@ -134,7 +159,7 @@ const Explore = () => {
       </div>
     </div>
     <div className='flex-between w-full max-w-5xl mt-16 mb-7'>
-      <h2 className='body-bold md:h3-bold'>Popular Today</h2>
+      <h2 className='body-bold md:h3-bold'>{showSearchResults? "Search result": "Popular Today"}</h2>
       <div className='flex-center gap-3 bg-secondary rounded-xl px-4 py-2 cursor-pointer'>
         <p className='small-medium md:base-medium text-foreground'>
           All
@@ -148,14 +173,15 @@ const Explore = () => {
       </div>
     </div>
     <div className="flex flex-wrap gap-9 w-full max-w-5xl">
-      {showSearchResults ? (<SearchResults/>): showPosts && (postList?.map((post,index)=>(
-        <PostCard key={`page-${index}`} post={post}/>
-      )))}
+      {showSearchResults ? (<SearchResults 
+      isSearching = {isSearching}
+      searchedPost = {searchedPost}
+      />): showPosts && ( <GridPostList postList={postDoc}/>)}
     </div>
     <div className=" mt-4">
 
-      { loading && !allCaughtUp && (<Loader/>)}
-      {allCaughtUp && ( (
+      {!isSearching && (loading && !allCaughtUp && (<Loader/>))}
+      {allCaughtUp && !isSearching  && ( (
         <p className="text-muted-foreground mt-10 text-center w-full">All caught up ✅</p>
       ))}
     </div>

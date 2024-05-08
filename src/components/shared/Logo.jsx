@@ -9,8 +9,7 @@ const Logo = () => {
     <img
       src={`${isDarkMode? "/assets/images/logo.svg": "/assets/images/logo_light.svg"}`}
       alt='logo'
-      width={130}
-      height={325}
+      className=" w-40 md:w-48"
     />
   </Link>
   )

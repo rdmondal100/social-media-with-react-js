@@ -4,25 +4,34 @@ import { useNavigate } from "react-router-dom";
 import {  useState } from "react";
 import Loader from "./Loader";
 import authService from "@/lib/appwrite/auth_services";
+import { useDispatch } from "react-redux";
+import { setLoggingOut } from "@/store/features/authSlice";
 
 const Logout = () => {
 	const navigate = useNavigate();
-  const[loading,setLoading] =useState(false)
   const[logOut,setLogOut]=useState(false)
-
+  const dispatch = useDispatch();
 
 	const handleLogout = async() => {
-		setLoading(true)
-		console.log("clicked logout")
-		const success = await authService.signOut();
-		console.log(success)
-		console.log(!!success)
-		setLogOut(!!success)
-		setLoading(false)
-		if(!!success){
-			navigate('/sign-in')
+		try {
+			dispatch(setLoggingOut(true))
+
+			console.log("clicked logout")
+			const success = await authService.signOut();
+			console.log(success)
+			console.log(!!success)
+			setLogOut(!!success)
+			if(!!success){
+				navigate('/sign-in')
+			}
+			console.log(logOut)
+		} catch (error) {
+			console.log(error)
+		}finally{
+			dispatch(setLoggingOut(false))
+
 		}
-		console.log(logOut)
+
 	}
 
 
@@ -33,9 +42,7 @@ const Logout = () => {
 			className='flex gap-4 items-center justify-start hover:text-white group'
 			onClick={handleLogout}
 		>
-			
-			{loading && <Loader/>}
-	
+				
 			<IoLogOut className='text-2xl text-muted-foreground group-hover:text-white' />{" "}
 			<p>Logout</p>
 	

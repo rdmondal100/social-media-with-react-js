@@ -6,7 +6,7 @@ const initialState = {
   isLoading: false,
   isAuthenticated: false,
   isDarkMode:true,
-
+  loggingOut:false,
 }
 
 const authSlice = createSlice({
@@ -33,10 +33,13 @@ const authSlice = createSlice({
     },
     setThemeMode:(state,action)=>{
       state.isDarkMode=action.payload
+    },
+    setLoggingOut:(state,action)=>{
+      state.loggingOut=action.payload
     }
   }
 })
 
 
-export const { setUser, setIsAuthenticated, setIsLoading,setThemeMode } = authSlice.actions;
+export const { setUser, setIsAuthenticated, setIsLoading,setThemeMode,setLoggingOut } = authSlice.actions;
 export default authSlice.reducer;

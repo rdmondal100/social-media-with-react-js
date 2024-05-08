@@ -120,6 +120,7 @@ export class AuthService {
   async getCurrentUserAccount() {
     try {
       const currentAccount = await this.account.get();
+      console.log(currentAccount)
       if (!currentAccount) {
         return null
       }

@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/toaster"
 import "./globals.css";
 import { useEffect } from "react";
 import useCheckAuthUser from "./hooks/useCheckAuthUser";
+import Loader from "./components/shared/Loader";
+import { useSelector } from "react-redux";
 
 
 
@@ -16,15 +18,20 @@ const App = () => {
 
 	const {checkAuthUser} =useCheckAuthUser();
 	const navigate = useNavigate();
+	const {pathname} = useLocation();
+  const {loggingOut} = useSelector((state)=>state.auth)
 
 	useEffect(() => {
 		const initialCheck = async () => {
-			// authService.signOut()
 			const currentStatus = await checkAuthUser();
 			console.log(currentStatus)
 			if (currentStatus) {
 				console.log("i am authenticated")
-				navigate("/");
+				const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+				if(!lastVisitedPage){
+					navigate("/")
+				}
+
 			}
 			else if (localStorage.getItem("cookieFallback") === '[]'|| localStorage.getItem('cookieFallback') === null
 		)  {
@@ -41,6 +48,18 @@ const App = () => {
 		initialCheck();
 	}, []);
 
+	useEffect(() => {
+		// Store the last visited URL in localStorage
+		localStorage.setItem("lastVisitedPage", pathname);
+}, [pathname]);
+
+useEffect(() => {
+		// Check if there's a stored last visited URL
+		const lastVisitedPage = localStorage.getItem("lastVisitedPage");
+		if (lastVisitedPage && pathname === "/") {
+				navigate(lastVisitedPage);
+		}
+}, []);
 	return (
 		<main className=' flex '>
 			<Toaster/>
@@ -64,7 +83,7 @@ const App = () => {
 					<Route path="/update-profile/:id/*" element = {<UpdateProfile/>}/>
 					</Route>
 			</Routes>
-			
+			{loggingOut && (<div className=" absolute z-50 w-full h-full flex bg-muted/50"> <Loader className="lg:w-16 w-12"/></div>)}
 		</main>
 	);
 };
