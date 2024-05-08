@@ -5,7 +5,7 @@ import {  useState } from "react";
 import Loader from "./Loader";
 import authService from "@/lib/appwrite/auth_services";
 import { useDispatch } from "react-redux";
-import { setLoggingOut } from "@/store/features/authSlice";
+import { setAppLoading } from "@/store/features/authSlice";
 
 const Logout = () => {
 	const navigate = useNavigate();
@@ -14,7 +14,7 @@ const Logout = () => {
 
 	const handleLogout = async() => {
 		try {
-			dispatch(setLoggingOut(true))
+			dispatch(setAppLoading(true))
 
 			console.log("clicked logout")
 			const success = await authService.signOut();
@@ -28,7 +28,7 @@ const Logout = () => {
 		} catch (error) {
 			console.log(error)
 		}finally{
-			dispatch(setLoggingOut(false))
+			dispatch(setAppLoading(false))
 
 		}
 

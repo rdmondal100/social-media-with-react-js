@@ -14,6 +14,7 @@ const Profile = () => {
 
     const getUserInfo = async ()=>{
       try {
+        setIsSearchig(true)
         const userInfo = await postServices.getUserInfo(id)
         console.log(userInfo)
         if(!userInfo){

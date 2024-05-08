@@ -19,7 +19,7 @@ const App = () => {
 	const {checkAuthUser} =useCheckAuthUser();
 	const navigate = useNavigate();
 	const {pathname} = useLocation();
-  const {loggingOut} = useSelector((state)=>state.auth)
+  const {appLoading} = useSelector((state)=>state.auth)
 
 	useEffect(() => {
 		const initialCheck = async () => {
@@ -83,7 +83,7 @@ useEffect(() => {
 					<Route path="/update-profile/:id/*" element = {<UpdateProfile/>}/>
 					</Route>
 			</Routes>
-			{loggingOut && (<div className=" absolute z-50 w-full h-screen flex bg-muted/50"> <Loader className="lg:w-16 w-12"/></div>)}
+			{appLoading && (<div className=" absolute z-50 w-full h-screen flex bg-muted/50"> <Loader className="lg:w-16 w-12"/></div>)}
 		</main>
 	);
 };
