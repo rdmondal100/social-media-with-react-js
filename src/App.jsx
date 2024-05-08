@@ -83,7 +83,7 @@ useEffect(() => {
 					<Route path="/update-profile/:id/*" element = {<UpdateProfile/>}/>
 					</Route>
 			</Routes>
-			{loggingOut && (<div className=" absolute z-50 w-full h-full flex bg-muted/50"> <Loader className="lg:w-16 w-12"/></div>)}
+			{loggingOut && (<div className=" absolute z-50 w-full h-screen flex bg-muted/50"> <Loader className="lg:w-16 w-12"/></div>)}
 		</main>
 	);
 };

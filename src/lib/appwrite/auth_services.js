@@ -80,7 +80,7 @@ export class AuthService {
     console.log(email)
     console.log(password)
     try {
-      const session = await this.account.createEmailPasswordSession(email, password)
+      const session = await this.account.createEmailSession(email, password)
       console.log("Successfully Logged in")
       console.log(session)
       return session;
